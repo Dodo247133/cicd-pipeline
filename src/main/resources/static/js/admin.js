@@ -1,4 +1,4 @@
-// Admin Dashboard Management Script for CloudCon 2026
+// Admin Dashboard Management & Authentication Script for CloudCon 2026
 
 const API_BASE = (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '8080' && window.location.port !== '80'))
   ? 'http://localhost:8080'
@@ -47,8 +47,19 @@ function saveLocalParticipants(list) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadAdminStats();
-  loadParticipants();
+  checkAuthAndRender();
+
+  // Admin Login Handler
+  const loginForm = document.getElementById('adminLoginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', handleAdminLogin);
+  }
+
+  // Logout Handler
+  const logoutBtn = document.getElementById('btnLogout');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleAdminLogout);
+  }
 
   document.getElementById('btnRefresh').addEventListener('click', () => {
     loadAdminStats();
@@ -60,6 +71,78 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('trackFilter').addEventListener('change', filterAndRender);
   document.getElementById('btnExportCSV').addEventListener('click', exportToCSV);
 });
+
+// Authentication Gate Check
+function checkAuthAndRender() {
+  const token = sessionStorage.getItem('cloudcon_admin_token');
+  const loginSection = document.getElementById('adminLoginSection');
+  const dashboardSection = document.getElementById('adminDashboardSection');
+  const navAuth = document.getElementById('adminNavAuth');
+
+  if (token) {
+    loginSection.style.display = 'none';
+    dashboardSection.style.display = 'block';
+    navAuth.style.display = 'flex';
+    loadAdminStats();
+    loadParticipants();
+  } else {
+    loginSection.style.display = 'block';
+    dashboardSection.style.display = 'none';
+    navAuth.style.display = 'none';
+  }
+}
+
+// Handle Admin Login Submission
+async function handleAdminLogin(e) {
+  e.preventDefault();
+  const username = document.getElementById('adminUsername').value.trim();
+  const password = document.getElementById('adminPassword').value.trim();
+  const errorAlert = document.getElementById('adminLoginError');
+  const submitBtn = document.getElementById('adminLoginSubmitBtn');
+
+  errorAlert.style.display = 'none';
+  submitBtn.disabled = true;
+  submitBtn.innerText = 'Verifying...';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      sessionStorage.setItem('cloudcon_admin_token', data.token || 'admin-active-session');
+      checkAuthAndRender();
+      return;
+    } else if (res.status === 401) {
+      errorAlert.innerText = 'Invalid administrator credentials. Access denied.';
+      errorAlert.style.display = 'block';
+      return;
+    }
+  } catch (err) {
+    // Backend offline / static fallback authentication
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerText = 'Authenticate as Administrator';
+  }
+
+  // Fallback verification for demo / static execution
+  if (username === 'admin' && password === 'admin123') {
+    sessionStorage.setItem('cloudcon_admin_token', 'admin-session-' + Date.now());
+    checkAuthAndRender();
+  } else {
+    errorAlert.innerText = 'Access Denied: Invalid admin username or password.';
+    errorAlert.style.display = 'block';
+  }
+}
+
+// Handle Admin Logout
+function handleAdminLogout() {
+  sessionStorage.removeItem('cloudcon_admin_token');
+  checkAuthAndRender();
+}
 
 // Load KPI counts
 async function loadAdminStats() {

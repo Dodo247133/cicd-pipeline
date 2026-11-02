@@ -123,6 +123,26 @@ const server = http.createServer(async (req, res) => {
     });
   }
 
+  // Admin Authentication
+  if (pathname === '/api/admin/login' && method === 'POST') {
+    try {
+      const data = await parseBody(req);
+      const { username, password } = data;
+      if (username === 'admin' && password === 'admin123') {
+        return sendJson(res, 200, {
+          success: true,
+          token: 'token-' + Buffer.from(username + ':' + Date.now()).toString('base64'),
+          username: 'admin',
+          role: 'ADMINISTRATOR'
+        });
+      } else {
+        return sendJson(res, 401, { error: 'Invalid administrator credentials. Access denied.' });
+      }
+    } catch (e) {
+      return sendJson(res, 400, { error: 'Invalid request body' });
+    }
+  }
+
   // Register participant
   if (pathname === '/api/register' && method === 'POST') {
     try {
@@ -242,10 +262,10 @@ const server = http.createServer(async (req, res) => {
 });
 
 if (require.main === module) {
-  server.listen(PORT, '127.0.0.1', () => {
-    console.log(`[CloudCon 2026] Server running at http://127.0.0.1:${PORT}/`);
-    console.log(`[CloudCon 2026] Healthcheck: http://127.0.0.1:${PORT}/api/health`);
-    console.log(`[CloudCon 2026] Admin Portal: http://127.0.0.1:${PORT}/admin.html`);
+  server.listen(PORT, () => {
+    console.log(`[CloudCon 2026] Server running at http://localhost:${PORT}/`);
+    console.log(`[CloudCon 2026] Healthcheck: http://localhost:${PORT}/api/health`);
+    console.log(`[CloudCon 2026] Admin Portal: http://localhost:${PORT}/admin.html`);
   });
 }
 
