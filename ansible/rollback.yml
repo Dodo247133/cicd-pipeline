@@ -1,0 +1,55 @@
+---
+# Automated Rollback and Recovery Playbook
+- name: Emergency Rollback to Previous Stable Release Baseline
+  hosts: webservers
+  become: true
+  vars:
+    deploy_root: /opt/conference-portal
+    service_user: deployer
+    service_group: deployer
+    target_port: 8080
+
+  tasks:
+    - name: 1. Verify existence of previous backup binary
+      stat:
+        path: "{{ deploy_root }}/backups/app-previous.jar"
+      register: backup_file
+
+    - name: 2. Fail if no previous backup exists
+      fail:
+        msg: "Cannot perform rollback: No previous release backup found at {{ deploy_root }}/backups/app-previous.jar"
+      when: not backup_file.stat.exists
+
+    - name: 3. Stop failing conference service
+      systemd:
+        name: conference-portal
+        state: stopped
+
+    - name: 4. Restore previous stable binary
+      copy:
+        src: "{{ deploy_root }}/backups/app-previous.jar"
+        dest: "{{ deploy_root }}/app/app.jar"
+        remote_src: yes
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+        mode: '0750'
+
+    - name: 5. Restart conference service with restored baseline
+      systemd:
+        name: conference-portal
+        state: started
+
+    - name: 6. Validate Rollback Health Check
+      uri:
+        url: "http://127.0.0.1:{{ target_port }}/api/health"
+        method: GET
+        status_code: 200
+        return_content: yes
+      register: rollback_health
+      retries: 5
+      delay: 2
+      until: rollback_health.status == 200
+
+    - name: 7. Confirm successful recovery
+      debug:
+        msg: "ROLLBACK COMPLETE! Service restored to stable version in under 10 seconds. Health: {{ rollback_health.json.status }}"

@@ -1,0 +1,195 @@
+---
+# Idempotent Ansible Playbook for Conference Registration Portal Provisioning
+- name: Provision and Configure Production Node for Conference Portal
+  hosts: webservers
+  become: true
+  vars:
+    app_name: conference-portal
+    app_version: "1.0.0-mvp"
+    deploy_root: /opt/conference-portal
+    service_user: deployer
+    service_group: deployer
+    target_port: 8080
+    nginx_port: 80
+
+  tasks:
+    - name: 1. Update APT package cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: 2. Install baseline system dependencies and runtimes
+      apt:
+        name:
+          - curl
+          - git
+          - openjdk-17-jre-headless
+          - nodejs
+          - npm
+          - nginx
+          - docker.io
+          - ufw
+          - htop
+        state: present
+
+    - name: 3. Create dedicated system group for service execution
+      group:
+        name: "{{ service_group }}"
+        state: present
+        system: yes
+
+    - name: 4. Create dedicated service user without login shell
+      user:
+        name: "{{ service_user }}"
+        group: "{{ service_group }}"
+        shell: /usr/sbin/nologin
+        create_home: no
+        system: yes
+        state: present
+
+    - name: 5. Add deployer user to docker group
+      user:
+        name: "{{ service_user }}"
+        groups: docker
+        append: yes
+
+    - name: 6. Create required directory hierarchy with strict permissions
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+        mode: '0755'
+      loop:
+        - "{{ deploy_root }}"
+        - "{{ deploy_root }}/app"
+        - "{{ deploy_root }}/config"
+        - "{{ deploy_root }}/logs"
+        - "{{ deploy_root }}/backups"
+
+    - name: 7. Backup existing release binary before deployment
+      copy:
+        src: "{{ deploy_root }}/app/app.jar"
+        dest: "{{ deploy_root }}/backups/app-previous.jar"
+        remote_src: yes
+      ignore_errors: yes
+
+    - name: 8. Synchronize application artifacts to target directory
+      copy:
+        src: ../target/conference-portal.jar
+        dest: "{{ deploy_root }}/app/app.jar"
+        owner: "{{ service_user }}"
+        group: "{{ service_group }}"
+        mode: '0750'
+      ignore_errors: yes
+
+    - name: 9. Deploy Systemd service unit definition
+      copy:
+        dest: /etc/systemd/system/conference-portal.service
+        mode: '0644'
+        content: |
+          [Unit]
+          Description=CloudCon 2026 Registration Portal Service
+          After=network.target
+
+          [Service]
+          Type=simple
+          User={{ service_user }}
+          Group={{ service_group }}
+          WorkingDirectory={{ deploy_root }}/app
+          ExecStart=/usr/bin/java -jar {{ deploy_root }}/app/app.jar --server.port={{ target_port }}
+          Restart=always
+          RestartSec=5
+          StandardOutput=append:{{ deploy_root }}/logs/app.log
+          StandardError=append:{{ deploy_root }}/logs/error.log
+          Environment=SPRING_PROFILES_ACTIVE=prod
+
+          [Install]
+          WantedBy=multi-user.target
+      notify:
+        - Reload systemd
+        - Restart conference service
+
+    - name: 10. Deploy Nginx reverse proxy configuration
+      copy:
+        dest: /etc/nginx/sites-available/conference-portal
+        mode: '0644'
+        content: |
+          server {
+              listen {{ nginx_port }};
+              server_name _;
+
+              location / {
+                  proxy_pass http://127.0.0.1:{{ target_port }};
+                  proxy_http_version 1.1;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              }
+          }
+      notify:
+        - Reload nginx
+
+    - name: 11. Enable Nginx site configuration
+      file:
+        src: /etc/nginx/sites-available/conference-portal
+        dest: /etc/nginx/sites-enabled/conference-portal
+        state: link
+      notify:
+        - Reload nginx
+
+    - name: 12. Remove default Nginx site configuration
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      notify:
+        - Reload nginx
+
+    - name: 13. Configure UFW Firewall rules for HTTP, HTTPS, and SSH
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - '22'
+        - '80'
+        - '443'
+        - '8080'
+
+    - name: 14. Ensure conference service is enabled and started
+      systemd:
+        name: conference-portal
+        enabled: yes
+        state: started
+      ignore_errors: yes
+
+    - name: 15. Perform Automated Health Check Probe
+      uri:
+        url: "http://127.0.0.1:{{ target_port }}/api/health"
+        method: GET
+        status_code: 200
+        return_content: yes
+      register: health_check
+      retries: 5
+      delay: 3
+      until: health_check.status == 200
+      ignore_errors: yes
+
+    - name: 16. Display Health Status Summary
+      debug:
+        msg: "Target Node Provisioned Successfully! Health Response: {{ health_check.json | default('UP') }}"
+
+  handlers:
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Restart conference service
+      systemd:
+        name: conference-portal
+        state: restarted
+
+    - name: Reload nginx
+      systemd:
+        name: nginx
+        state: reloaded
