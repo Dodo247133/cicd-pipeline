@@ -400,7 +400,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 if (require.main === module) {
-  server.listen(PORT, () => {
+  server.listen(PORT, '0.0.0.0', () => {
     console.log(`[CloudCon 2026] Server running at http://localhost:${PORT}/`);
     console.log(`[CloudCon 2026] Healthcheck: http://localhost:${PORT}/api/health`);
     console.log(`[CloudCon 2026] Admin Portal: http://localhost:${PORT}/admin.html`);
