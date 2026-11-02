@@ -1,0 +1,13 @@
+{
+  "name": "conference-registration-portal",
+  "version": "1.0.0",
+  "description": "Conference Registration Portal with full CI/CD pipeline",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests/selenium_local_test.js"
+  },
+  "keywords": ["conference", "devops", "ci-cd", "jenkins", "docker", "selenium", "ansible"],
+  "author": "DevOps Engineering Team",
+  "license": "MIT"
+}
