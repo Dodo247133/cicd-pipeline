@@ -83,86 +83,200 @@
 
     <!-- Admin Dashboard Section (Visible only when authenticated) -->
     <div id="adminDashboardSection" style="display: none;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-        <div>
-          <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--dark);">Participant Approval & Registry</h1>
-          <p style="color: var(--gray-600); font-size: 0.95rem;">Review submissions, approve passes, filter by tracks, and track attendee check-in.</p>
-        </div>
-        <button id="btnRefresh" class="btn btn-sm" style="background: var(--gray-200); color: var(--gray-700);">
-          🔄 Refresh
+      
+      <!-- Tab Controls -->
+      <div class="tabs-header">
+        <button id="tabBtnRegistrations" class="tab-btn active">
+          👥 Participant Registrations (<span id="adminStatTabCount">0</span>)
+        </button>
+        <button id="tabBtnEvents" class="tab-btn">
+          🎪 Host & Manage Events (<span id="adminEventsTabCount">4</span>)
         </button>
       </div>
 
-      <!-- KPI Metric Counters -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="label">Total Records</div>
-          <div class="value" id="adminStatTotal">0</div>
+      <!-- VIEW 1: Participant Registrations Tab -->
+      <div id="viewRegistrations">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--dark);">Participant Approval & Registry</h1>
+            <p style="color: var(--gray-600); font-size: 0.95rem;">Review submissions, approve passes, filter by tracks, and track attendee check-in.</p>
+          </div>
+          <button id="btnRefresh" class="btn btn-sm" style="background: var(--gray-200); color: var(--gray-700);">
+            🔄 Refresh
+          </button>
         </div>
-        <div class="stat-card">
-          <div class="label">Pending Review</div>
-          <div class="value" id="adminStatPending" style="color: var(--warning);">0</div>
+
+        <!-- KPI Metric Counters -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="label">Total Records</div>
+            <div class="value" id="adminStatTotal">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Pending Review</div>
+            <div class="value" id="adminStatPending" style="color: var(--warning);">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Approved Passes</div>
+            <div class="value" id="adminStatApproved" style="color: var(--success);">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Rejected</div>
+            <div class="value" id="adminStatRejected" style="color: var(--danger);">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Checked In</div>
+            <div class="value" id="adminStatCheckedIn" style="color: var(--primary);">0</div>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="label">Approved Passes</div>
-          <div class="value" id="adminStatApproved" style="color: var(--success);">0</div>
+
+        <!-- Toolbar Filters -->
+        <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+          <div class="toolbar" style="margin-bottom: 0;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search by name, email, ID, event...">
+            
+            <select id="statusFilter" class="form-control">
+              <option value="">All Statuses</option>
+              <option value="PENDING">Pending</option>
+              <option value="APPROVED">Approved</option>
+              <option value="REJECTED">Rejected</option>
+              <option value="CHECKED_IN">Checked In</option>
+            </select>
+
+            <select id="trackFilter" class="form-control">
+              <option value="">All Tracks</option>
+              <option value="DevOps & Cloud">DevOps & Cloud</option>
+              <option value="AI & Data">AI & Data</option>
+              <option value="Security & Governance">Security & Governance</option>
+            </select>
+          </div>
         </div>
-        <div class="stat-card">
-          <div class="label">Rejected</div>
-          <div class="value" id="adminStatRejected" style="color: var(--danger);">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="label">Checked In</div>
-          <div class="value" id="adminStatCheckedIn" style="color: var(--primary);">0</div>
+
+        <!-- Participants Table -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-responsive">
+            <table class="table" id="participantsTable">
+              <thead>
+                <tr>
+                  <th>Reg ID</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Event Registered</th>
+                  <th>Ticket</th>
+                  <th>Track</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="participantsTableBody">
+                <tr>
+                  <td colspan="8" style="text-align: center; padding: 2rem; color: var(--gray-600);">Loading participants...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
-      <!-- Toolbar Filters -->
-      <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
-        <div class="toolbar" style="margin-bottom: 0;">
-          <input type="text" id="searchInput" class="form-control" placeholder="Search by name, email, ID...">
-          
-          <select id="statusFilter" class="form-control">
-            <option value="">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
-            <option value="CHECKED_IN">Checked In</option>
-          </select>
-
-          <select id="trackFilter" class="form-control">
-            <option value="">All Tracks</option>
-            <option value="DevOps & Cloud">DevOps & Cloud</option>
-            <option value="AI & Data">AI & Data</option>
-            <option value="Security & Governance">Security & Governance</option>
-          </select>
+      <!-- VIEW 2: Events Management Tab -->
+      <div id="viewEvents" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h1 style="font-size: 1.8rem; font-weight: 800; color: var(--dark);">Host & Manage Conference Events</h1>
+            <p style="color: var(--gray-600); font-size: 0.95rem;">Publish new summits, workshops, and keynotes. These will immediately appear on the student/attendee portal for search and registration.</p>
+          </div>
         </div>
+
+        <!-- Host New Event Card -->
+        <div class="card" style="margin-bottom: 2rem; border-top: 4px solid var(--primary);">
+          <h2 class="card-title">🚀 Host a New Conference Event</h2>
+          <p class="card-subtitle">Fill out the event details below to open registration for attendees.</p>
+
+          <div id="hostEventAlert" class="alert alert-success" style="display: none;"></div>
+          <div id="hostEventError" class="alert alert-danger" style="display: none;"></div>
+
+          <form id="hostEventForm" novalidate>
+            <div class="form-row">
+              <div class="form-group" style="grid-column: span 2;">
+                <label class="form-label" for="newEventTitle">Event Title <span class="req">*</span></label>
+                <input type="text" id="newEventTitle" class="form-control" placeholder="e.g. Kubernetes & Cloud Native Summit 2026" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="newEventTrack">Conference Track <span class="req">*</span></label>
+                <select id="newEventTrack" class="form-control" required>
+                  <option value="">Select track...</option>
+                  <option value="DevOps & Cloud">DevOps & Cloud</option>
+                  <option value="AI & Data">AI & Data</option>
+                  <option value="Security & Governance">Security & Governance</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="newEventDate">Event Date <span class="req">*</span></label>
+                <input type="date" id="newEventDate" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="newEventLocation">Location / Stream URL</label>
+                <input type="text" id="newEventLocation" class="form-control" placeholder="e.g. San Francisco & Virtual Stream" value="San Francisco & Virtual">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="newEventCapacity">Total Attendee Capacity</label>
+                <input type="number" id="newEventCapacity" class="form-control" placeholder="250" value="250" min="10" max="5000">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="newEventPrice">Ticket Pricing</label>
+                <input type="text" id="newEventPrice" class="form-control" placeholder="e.g. Free / Standard $49" value="Free Registration">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="newEventDesc">Event Description & Keynote Highlights</label>
+              <textarea id="newEventDesc" class="form-control" rows="3" placeholder="Describe the topics, speakers, and workshop hands-on tracks..."></textarea>
+            </div>
+
+            <button type="submit" id="btnPublishEvent" class="btn btn-primary" style="max-width: 250px;">
+              Publish & Host Event
+            </button>
+          </form>
+        </div>
+
+        <!-- Hosted Events Table -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div style="padding: 1.25rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--dark);">Active Hosted Events</h3>
+            <span class="badge badge-pending" id="eventsBadgeTotal">4 Events Active</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table" id="eventsTable">
+              <thead>
+                <tr>
+                  <th>Event ID</th>
+                  <th>Event Title</th>
+                  <th>Track</th>
+                  <th>Date & Location</th>
+                  <th>Capacity / Registered</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="eventsTableBody">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 2rem;">Loading events...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
 
-      <!-- Participants Table -->
-      <div class="card" style="padding: 0; overflow: hidden;">
-        <div class="table-responsive">
-          <table class="table" id="participantsTable">
-            <thead>
-              <tr>
-                <th>Reg ID</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Affiliation</th>
-                <th>Ticket</th>
-                <th>Track</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="participantsTableBody">
-              <tr>
-                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--gray-600);">Loading participants...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
 
   </main>

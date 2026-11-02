@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cloud & DevOps Global Summit 2026 - Registration Portal</title>
+  <title>Cloud & DevOps Global Summit 2026 - Registration & Event Portal</title>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -21,7 +21,8 @@
         <span>CloudCon 2026</span>
       </a>
       <nav class="nav-links">
-        <a href="#register-section" class="active">Register</a>
+        <a href="#events-section">Search Events</a>
+        <a href="#register-section">Register</a>
         <a href="#track-section">Track Status</a>
         <a href="admin.html" class="btn-nav">🔒 Admin Sign-In</a>
       </nav>
@@ -31,11 +32,11 @@
   <!-- Hero Banner -->
   <section class="hero">
     <h1>Cloud & DevOps Global Summit 2026</h1>
-    <p>Join world-class engineers, architects, and DevOps practitioners exploring CI/CD, Containerization, Infrastructure as Code, and AI-Driven Observability.</p>
+    <p>Discover, explore, and register for cutting-edge summits, workshops, and technical keynotes in Cloud Native, Generative AI, and DevSecOps.</p>
     <div class="hero-meta">
-      <span>📅 November 12-14, 2026</span>
-      <span>📍 San Francisco & Virtual Stream</span>
-      <span>🚀 3 Tracks & 45 Keynotes</span>
+      <span>📅 November & December 2026</span>
+      <span>📍 San Francisco & Global Stream</span>
+      <span>🚀 Multiple Tracks & Certification Labs</span>
     </div>
   </section>
 
@@ -53,8 +54,8 @@
         <div class="value" id="statApproved" style="color: var(--success);">--</div>
       </div>
       <div class="stat-card">
-        <div class="label">Pending Review</div>
-        <div class="value" id="statPending" style="color: var(--warning);">--</div>
+        <div class="label">Active Events</div>
+        <div class="value" id="statEventsCount" style="color: var(--primary);">4</div>
       </div>
       <div class="stat-card">
         <div class="label">Attendance Rate</div>
@@ -62,12 +63,39 @@
       </div>
     </div>
 
+    <!-- Explore & Search Events Section -->
+    <section class="card" id="events-section" style="margin-bottom: 2.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+        <div>
+          <h2 class="card-title">Explore & Search Upcoming Events</h2>
+          <p class="card-subtitle" style="margin-bottom: 0;">Find conferences, workshops, and symposiums to attend. Click <strong>Register</strong> on any event to sign up immediately.</p>
+        </div>
+      </div>
+
+      <!-- Search & Filters Toolbar -->
+      <div class="toolbar" style="margin-bottom: 0.5rem;">
+        <input type="text" id="eventSearchInput" class="form-control" style="flex: 1; max-width: 400px;" placeholder="🔍 Search by event title, keyword, or location...">
+        
+        <select id="eventTrackFilter" class="form-control" style="max-width: 240px;">
+          <option value="">All Categories & Tracks</option>
+          <option value="DevOps & Cloud">DevOps & Cloud</option>
+          <option value="AI & Data">AI & Data</option>
+          <option value="Security & Governance">Security & Governance</option>
+        </select>
+      </div>
+
+      <!-- Dynamic Events Grid -->
+      <div id="eventsGrid" class="events-grid">
+        <div style="text-align: center; grid-column: 1 / -1; padding: 2rem; color: var(--gray-600);">Loading available conference events...</div>
+      </div>
+    </section>
+
     <div class="card-grid">
 
       <!-- Registration Form Card -->
       <section class="card" id="register-section">
-        <h2 class="card-title">Attendee Registration</h2>
-        <p class="card-subtitle">Complete your details to register for the summit. Immediate confirmation and tracking ID will be generated.</p>
+        <h2 class="card-title">Attendee Registration Form</h2>
+        <p class="card-subtitle">Select an event and complete your details to reserve your seat. Instant confirmation and tracking ID will be generated.</p>
 
         <!-- Dynamic Feedback Alerts -->
         <div id="validationAlert" class="alert alert-danger"></div>
@@ -76,35 +104,42 @@
         <!-- Registration Form -->
         <form id="registrationForm" novalidate>
           <div class="form-group">
+            <label class="form-label" for="selectedEvent">Selected Conference / Event <span class="req">*</span></label>
+            <select id="selectedEvent" class="form-control" required>
+              <option value="">Loading events...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label class="form-label" for="fullName">Full Name <span class="req">*</span></label>
             <input type="text" id="fullName" class="form-control" placeholder="e.g. Dr. Jane Doe" required>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="email">Work Email <span class="req">*</span></label>
-              <input type="email" id="email" class="form-control" placeholder="jane@enterprise.com" required>
+              <label class="form-label" for="email">Work / Student Email <span class="req">*</span></label>
+              <input type="email" id="email" class="form-control" placeholder="jane@university.edu or jane@company.com" required>
             </div>
             <div class="form-group">
-              <label class="form-label" for="affiliation">Organization / Company <span class="req">*</span></label>
-              <input type="text" id="affiliation" class="form-control" placeholder="e.g. Acme Tech Labs" required>
+              <label class="form-label" for="affiliation">Organization / University <span class="req">*</span></label>
+              <input type="text" id="affiliation" class="form-control" placeholder="e.g. Stanford University / Tech Corp" required>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="ticketType">Ticket Type <span class="req">*</span></label>
+              <label class="form-label" for="ticketType">Ticket Category <span class="req">*</span></label>
               <select id="ticketType" class="form-control" required>
                 <option value="">Select ticket category...</option>
-                <option value="Standard">Standard (Full Access)</option>
-                <option value="VIP">VIP All-Access + Workshop</option>
-                <option value="Student">Student / Academic</option>
-                <option value="Speaker">Speaker / Panelist</option>
+                <option value="Student">Student / Academic Pass (Free)</option>
+                <option value="Standard">Standard Attendee Pass</option>
+                <option value="VIP">VIP All-Access + Workshop Pass</option>
+                <option value="Speaker">Speaker / Presenter Pass</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="track">Primary Conference Track <span class="req">*</span></label>
+              <label class="form-label" for="track">Conference Track <span class="req">*</span></label>
               <select id="track" class="form-control" required>
                 <option value="">Select conference track...</option>
                 <option value="DevOps & Cloud">DevOps & Cloud Native</option>
@@ -115,12 +150,12 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label" for="dietaryRequirement">Dietary Preferences / Special Requests</label>
-            <input type="text" id="dietaryRequirement" class="form-control" placeholder="e.g. Vegetarian, Gluten-Free, None">
+            <label class="form-label" for="dietaryRequirement">Special Accommodations / Dietary Requests</label>
+            <input type="text" id="dietaryRequirement" class="form-control" placeholder="e.g. Vegetarian, Halal, None">
           </div>
 
           <button type="submit" id="submitBtn" class="btn btn-primary">
-            Submit Registration
+            Submit Event Registration
           </button>
         </form>
 
@@ -131,16 +166,16 @@
             <polyline points="22 4 12 14.01 9 11.01"></polyline>
           </svg>
           <h3 style="color: #166534; font-weight: 700;">Registration Confirmed!</h3>
-          <p style="font-size: 0.9rem; color: #15803d;">Your registration has been submitted into the verification queue.</p>
+          <p style="font-size: 0.9rem; color: #15803d;" id="confirmedEventName">Your registration has been placed in the verification queue.</p>
           <div class="reg-id-display" id="confirmedRegId">CONF-XXXXXXXX</div>
-          <p style="font-size: 0.85rem; color: #475569;">Please save this Registration ID to track your pass approval and check-in status.</p>
+          <p style="font-size: 0.85rem; color: #475569;">Save this Registration ID to track your badge status and check-in at the desk.</p>
         </div>
       </section>
 
       <!-- Self-Service Tracking Section -->
       <section class="card" id="track-section">
         <h2 class="card-title">Registration Lookup</h2>
-        <p class="card-subtitle">Enter your Registration ID or Registered Email to check your approval status and ticket status.</p>
+        <p class="card-subtitle">Enter your Registration ID or Email to check your approval status and registered event.</p>
 
         <div class="form-group">
           <label class="form-label" for="trackInput">Registration ID or Email</label>
@@ -163,6 +198,7 @@
           </div>
           <div style="font-size: 0.9rem; line-height: 1.8;">
             <div><strong>ID:</strong> <span id="trackRegId" style="font-family: monospace;">--</span></div>
+            <div><strong>Event:</strong> <span id="trackEventTitle" style="font-weight: 600; color: var(--primary);">--</span></div>
             <div><strong>Email:</strong> <span id="trackEmail">--</span></div>
             <div><strong>Org:</strong> <span id="trackOrg">--</span></div>
             <div><strong>Track:</strong> <span id="trackTrack">--</span></div>
@@ -185,4 +221,3 @@
   <script src="js/app.js"></script>
 </body>
 </html>
-

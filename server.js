@@ -19,6 +19,8 @@ let participants = [
     affiliation: 'Computing Pioneer Lab',
     ticketType: 'VIP',
     track: 'DevOps & Cloud',
+    eventId: 'EVT-CLOUD2026',
+    eventTitle: 'Cloud Native & Kubernetes Global Summit',
     dietaryRequirement: 'None',
     status: 'APPROVED',
     createdAt: new Date().toISOString(),
@@ -32,6 +34,8 @@ let participants = [
     affiliation: 'Cryptography Institute',
     ticketType: 'Speaker',
     track: 'AI & Data',
+    eventId: 'EVT-AIGEN2026',
+    eventTitle: 'Generative AI & LLM Engineering Symposium',
     dietaryRequirement: 'Vegetarian',
     status: 'PENDING',
     createdAt: new Date().toISOString(),
@@ -40,6 +44,60 @@ let participants = [
 ];
 
 let nextId = 3;
+
+// In-Memory Hosted Events Dataset
+let events = [
+  {
+    id: 1,
+    eventId: 'EVT-CLOUD2026',
+    title: 'Cloud Native & Kubernetes Global Summit 2026',
+    track: 'DevOps & Cloud',
+    date: '2026-11-14',
+    location: 'San Francisco, CA & Virtual Stream',
+    capacity: 350,
+    registeredCount: 42,
+    price: 'Free / Standard $49',
+    description: 'Deep dive into Kubernetes v1.31, eBPF observability, service mesh architectures, and production GitOps workflows.'
+  },
+  {
+    id: 2,
+    eventId: 'EVT-AIGEN2026',
+    title: 'Generative AI & LLM Systems Symposium',
+    track: 'AI & Data',
+    date: '2026-11-20',
+    location: 'Virtual Live Stream',
+    capacity: 500,
+    registeredCount: 88,
+    price: 'Free / VIP $99',
+    description: 'Practical engineering for multi-agent workflows, fine-tuning reasoning models, RAG pipelines, and vector databases.'
+  },
+  {
+    id: 3,
+    eventId: 'EVT-SECDEV2026',
+    title: 'Zero-Trust DevSecOps Hands-On Workshop',
+    track: 'Security & Governance',
+    date: '2026-12-05',
+    location: 'Austin Tech Center & Virtual',
+    capacity: 150,
+    registeredCount: 19,
+    price: 'Standard $79',
+    description: 'Automated container vulnerability scanning with Trivy, SBOM enforcement, and policy-as-code guardrails.'
+  },
+  {
+    id: 4,
+    eventId: 'EVT-GITOPS2026',
+    title: 'Continuous Delivery & GitOps Masterclass',
+    track: 'DevOps & Cloud',
+    date: '2026-12-12',
+    location: 'Online Interactive Lab',
+    capacity: 200,
+    registeredCount: 31,
+    price: 'Student Free / Pro $29',
+    description: 'Master ArgoCD, Declarative Jenkins Pipelines, automated canary releases, and self-healing cloud clusters.'
+  }
+];
+
+let nextEventId = 5;
 
 const mimeTypes = {
   '.html': 'text/html',
@@ -143,11 +201,83 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // --- Events API Endpoints ---
+  // List events with search and track filters
+  if (pathname === '/api/events' && method === 'GET') {
+    let result = [...events];
+    const { search, track } = parsedUrl.query;
+
+    if (search) {
+      const q = search.toLowerCase().trim();
+      result = result.filter(e =>
+        e.title.toLowerCase().includes(q) ||
+        (e.description && e.description.toLowerCase().includes(q)) ||
+        (e.location && e.location.toLowerCase().includes(q))
+      );
+    }
+    if (track) {
+      result = result.filter(e => e.track.toLowerCase() === track.toLowerCase());
+    }
+
+    return sendJson(res, 200, result);
+  }
+
+  // Host a new event (Admin)
+  if (pathname === '/api/events' && method === 'POST') {
+    try {
+      const data = await parseBody(req);
+      const { title, track, date, location, capacity, price, description } = data;
+
+      if (!title || !track || !date) {
+        return sendJson(res, 400, { error: 'Event Title, Track, and Date are mandatory.' });
+      }
+
+      const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+      const eventId = `EVT-${randomSuffix}`;
+
+      const newEvent = {
+        id: nextEventId++,
+        eventId,
+        title,
+        track,
+        date,
+        location: location || 'San Francisco & Virtual',
+        capacity: parseInt(capacity) || 250,
+        registeredCount: 0,
+        price: price || 'Free Registration',
+        description: description || 'Specialized technical summit keynote and hands-on workshop.',
+        createdAt: new Date().toISOString()
+      };
+
+      events.unshift(newEvent);
+
+      return sendJson(res, 201, {
+        message: 'Event hosted and published successfully!',
+        event: newEvent
+      });
+    } catch (err) {
+      return sendJson(res, 400, { error: 'Invalid event JSON payload' });
+    }
+  }
+
+  // Delete an event
+  const eventDeleteMatch = pathname.match(/^\/api\/events\/([^/]+)$/);
+  if (eventDeleteMatch && method === 'DELETE') {
+    const targetId = eventDeleteMatch[1];
+    const index = events.findIndex(e => e.eventId === targetId || String(e.id) === targetId);
+    if (index !== -1) {
+      const removed = events.splice(index, 1)[0];
+      return sendJson(res, 200, { message: 'Event removed successfully', event: removed });
+    } else {
+      return sendJson(res, 404, { error: 'Event not found' });
+    }
+  }
+
   // Register participant
   if (pathname === '/api/register' && method === 'POST') {
     try {
       const data = await parseBody(req);
-      const { fullName, email, affiliation, ticketType, track, dietaryRequirement } = data;
+      const { fullName, email, affiliation, ticketType, track, dietaryRequirement, eventId } = data;
 
       if (!fullName || !email || !affiliation || !ticketType || !track) {
         return sendJson(res, 400, { error: 'All required fields must be provided.' });
@@ -160,6 +290,12 @@ const server = http.createServer(async (req, res) => {
       const randomSuffix = Math.random().toString(36).substring(2, 8).toUpperCase();
       const registrationId = `CONF-${randomSuffix}`;
 
+      // Link to selected event if applicable
+      let selectedEvt = events.find(e => e.eventId === eventId || e.title === data.eventTitle);
+      if (selectedEvt) {
+        selectedEvt.registeredCount = (selectedEvt.registeredCount || 0) + 1;
+      }
+
       const newParticipant = {
         id: nextId++,
         registrationId,
@@ -168,6 +304,8 @@ const server = http.createServer(async (req, res) => {
         affiliation,
         ticketType,
         track,
+        eventId: selectedEvt ? selectedEvt.eventId : (eventId || 'EVT-GLOBAL'),
+        eventTitle: selectedEvt ? selectedEvt.title : (data.eventTitle || 'Cloud & DevOps Global Summit 2026'),
         dietaryRequirement: dietaryRequirement || 'None',
         status: 'PENDING',
         createdAt: new Date().toISOString(),
