@@ -1,7 +1,7 @@
 {
   "name": "conference-registration-portal",
   "version": "1.0.0",
-  "description": "Conference Registration Portal with Live Stats Tracking v1.0.0",
+  "description": "Conference Registration Portal with Admin Management, Live Stats & CI/CD Pipeline v1.0.0-mvp",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
