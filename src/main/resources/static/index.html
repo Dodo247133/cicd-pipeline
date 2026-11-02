@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cloud & DevOps Global Summit 2026 - Registration Portal</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <span>CloudCon 2026</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#register-section" class="active">Register</a>
+        <a href="#track-section">Track Status</a>
+        <a href="admin.html" class="btn-nav">Admin Portal</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero">
+    <h1>Cloud & DevOps Global Summit 2026</h1>
+    <p>Join world-class engineers, architects, and DevOps practitioners exploring CI/CD, Containerization, Infrastructure as Code, and AI-Driven Observability.</p>
+    <div class="hero-meta">
+      <span>📅 November 12-14, 2026</span>
+      <span>📍 San Francisco & Virtual Stream</span>
+      <span>🚀 3 Tracks & 45 Keynotes</span>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="container">
+
+    <!-- KPI Metric Counters -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Total Registered</div>
+        <div class="value" id="statTotal">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Approved Passes</div>
+        <div class="value" id="statApproved" style="color: var(--success);">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Pending Review</div>
+        <div class="value" id="statPending" style="color: var(--warning);">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Attendance Rate</div>
+        <div class="value" id="statRate" style="color: var(--info);">--%</div>
+      </div>
+    </div>
+
+    <div class="card-grid">
+
+      <!-- Registration Form Card -->
+      <section class="card" id="register-section">
+        <h2 class="card-title">Attendee Registration</h2>
+        <p class="card-subtitle">Complete your details to register for the summit. Immediate confirmation and tracking ID will be generated.</p>
+
+        <!-- Dynamic Feedback Alerts -->
+        <div id="validationAlert" class="alert alert-danger"></div>
+        <div id="errorAlert" class="alert alert-danger"></div>
+
+        <!-- Registration Form -->
+        <form id="registrationForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="fullName">Full Name <span class="req">*</span></label>
+            <input type="text" id="fullName" class="form-control" placeholder="e.g. Dr. Jane Doe" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="email">Work Email <span class="req">*</span></label>
+              <input type="email" id="email" class="form-control" placeholder="jane@enterprise.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="affiliation">Organization / Company <span class="req">*</span></label>
+              <input type="text" id="affiliation" class="form-control" placeholder="e.g. Acme Tech Labs" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="ticketType">Ticket Type <span class="req">*</span></label>
+              <select id="ticketType" class="form-control" required>
+                <option value="">Select ticket category...</option>
+                <option value="Standard">Standard (Full Access)</option>
+                <option value="VIP">VIP All-Access + Workshop</option>
+                <option value="Student">Student / Academic</option>
+                <option value="Speaker">Speaker / Panelist</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="track">Primary Conference Track <span class="req">*</span></label>
+              <select id="track" class="form-control" required>
+                <option value="">Select conference track...</option>
+                <option value="DevOps & Cloud">DevOps & Cloud Native</option>
+                <option value="AI & Data">AI & Data Engineering</option>
+                <option value="Security & Governance">DevSecOps & Platform Governance</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="dietaryRequirement">Dietary Preferences / Special Requests</label>
+            <input type="text" id="dietaryRequirement" class="form-control" placeholder="e.g. Vegetarian, Gluten-Free, None">
+          </div>
+
+          <button type="submit" id="submitBtn" class="btn btn-primary">
+            Submit Registration
+          </button>
+        </form>
+
+        <!-- Confirmation Card (Shows after submission) -->
+        <div id="confirmationBox" class="confirmation-card">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" style="margin-bottom: 0.5rem;">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <h3 style="color: #166534; font-weight: 700;">Registration Confirmed!</h3>
+          <p style="font-size: 0.9rem; color: #15803d;">Your registration has been submitted into the verification queue.</p>
+          <div class="reg-id-display" id="confirmedRegId">CONF-XXXXXXXX</div>
+          <p style="font-size: 0.85rem; color: #475569;">Please save this Registration ID to track your pass approval and check-in status.</p>
+        </div>
+      </section>
+
+      <!-- Self-Service Tracking Section -->
+      <section class="card" id="track-section">
+        <h2 class="card-title">Registration Lookup</h2>
+        <p class="card-subtitle">Enter your Registration ID or Registered Email to check your approval status and ticket status.</p>
+
+        <div class="form-group">
+          <label class="form-label" for="trackInput">Registration ID or Email</label>
+          <input type="text" id="trackInput" class="form-control" placeholder="e.g. CONF-A1B2C3D4 or you@domain.com">
+        </div>
+
+        <button type="button" id="trackBtn" class="btn btn-primary" style="background: var(--info);">
+          Lookup Status
+        </button>
+
+        <div id="trackNotFound" class="alert alert-danger" style="margin-top: 1rem;">
+          No registration record found. Please verify your ID or email.
+        </div>
+
+        <!-- Result Card -->
+        <div id="trackResultCard" style="display: none; margin-top: 1.5rem; padding: 1.25rem; border-radius: 8px; background: var(--gray-100); border: 1px solid var(--gray-200);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <strong id="trackFullName" style="font-size: 1.1rem; color: var(--dark);">--</strong>
+            <span id="trackStatusBadge" class="badge">--</span>
+          </div>
+          <div style="font-size: 0.9rem; line-height: 1.8;">
+            <div><strong>ID:</strong> <span id="trackRegId" style="font-family: monospace;">--</span></div>
+            <div><strong>Email:</strong> <span id="trackEmail">--</span></div>
+            <div><strong>Org:</strong> <span id="trackOrg">--</span></div>
+            <div><strong>Track:</strong> <span id="trackTrack">--</span></div>
+            <div><strong>Ticket:</strong> <span id="trackTicket">--</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>CloudCon 2026 &copy; Continuous Delivery & DevOps Summit. Powered by Automated CI/CD Pipeline.</p>
+      <p style="margin-top: 0.4rem; color: #94a3b8;">Spring Boot 3.2 &bull; Tomcat &bull; Docker &bull; Jenkins &bull; Ansible</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
