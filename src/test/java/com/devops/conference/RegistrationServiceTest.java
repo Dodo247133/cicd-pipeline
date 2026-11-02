@@ -109,3 +109,4 @@ public class RegistrationServiceTest {
         assertEquals(50.0, (Double) stats.get("activePercentage"));
     }
 }
+

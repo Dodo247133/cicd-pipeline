@@ -89,3 +89,4 @@ The XML report is generated at `target/surefire-reports/TEST-com.devops.conferen
 </testsuite>
 ```
 All journeys succeeded with zero failures.
+

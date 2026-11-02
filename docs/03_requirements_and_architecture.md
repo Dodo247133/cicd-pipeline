@@ -129,3 +129,4 @@ erDiagram
    - Attendee UI: `http://localhost:8080/index.html`
    - Admin UI: `http://localhost:8080/admin.html`
    - Healthcheck: `http://localhost:8080/api/health`
+

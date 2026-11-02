@@ -76,3 +76,4 @@ The Minimum Viable Product (MVP) scope is strictly bounded to the following 15 p
 | **TASK-13** | CSV Export | Add client-side CSV data export for event organizers | One-click downloadable CSV file |
 | **TASK-14** | Live Analytics | Implement `/api/stats` and KPI summary counters | Total, approved, pending, and rate widgets |
 | **TASK-15** | Health Endpoint | Implement `/api/health` actuator probe for DevOps | HTTP 200 JSON probe for CI/CD and containers |
+

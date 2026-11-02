@@ -134,3 +134,4 @@ git tag -a v1.0.0-mvp -m "Release v1.0.0-mvp: Conference Registration Portal cor
 | TASK-13 | CSV Export | Add client-side CSV data export | In Progress | **COMPLETED** |
 | TASK-14 | Live Analytics | Implement `/api/stats` and KPI counters | In Progress | **COMPLETED** |
 | TASK-15 | Health Endpoint | Implement `/api/health` actuator probe | In Progress | **COMPLETED** |
+

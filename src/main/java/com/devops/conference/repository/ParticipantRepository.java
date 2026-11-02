@@ -16,3 +16,4 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     List<Participant> findByTrack(String track);
     long countByStatus(String status);
 }
+

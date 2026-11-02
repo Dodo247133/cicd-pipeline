@@ -19,3 +19,4 @@ Closes # [issue number]
 - [ ] I have added unit / integration / Selenium tests that prove my fix is effective or that my feature works
 - [ ] New and existing tests pass locally with my changes
 - [ ] No merge conflicts with the base branch
+

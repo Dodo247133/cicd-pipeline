@@ -110,3 +110,4 @@ target-node-01             : ok=19   changed=15   unreachable=0    failed=0    s
 ```
 
 The node was fully provisioned from bare metal in 42 seconds with zero errors.
+

@@ -21,3 +21,4 @@ done
 
 echo "❌ [ERROR] Health Check Failed after $MAX_RETRIES attempts!"
 exit 1
+

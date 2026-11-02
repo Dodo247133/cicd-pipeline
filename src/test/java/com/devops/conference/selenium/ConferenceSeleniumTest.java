@@ -190,3 +190,4 @@ public class ConferenceSeleniumTest {
                 "Portal must prevent duplicate email registration");
     }
 }
+

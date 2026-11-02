@@ -53,3 +53,4 @@
     - name: 7. Confirm successful recovery
       debug:
         msg: "ROLLBACK COMPLETE! Service restored to stable version in under 10 seconds. Health: {{ rollback_health.json.status }}"
+

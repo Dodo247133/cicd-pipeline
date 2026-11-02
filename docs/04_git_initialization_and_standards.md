@@ -70,3 +70,4 @@ All commits adhere to the [Conventional Commits specification](https://www.conve
   - Direct pushes to `main` and `develop` are prohibited.
   - At least 1 peer approval required on Pull Requests.
   - All CI/CD status checks (Maven build, Selenium tests, Docker build) must pass before merging.
+

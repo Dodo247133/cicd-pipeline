@@ -109,3 +109,4 @@ public class RegistrationController {
         return ResponseEntity.ok(registrationService.getRegistrationStatistics());
     }
 }
+

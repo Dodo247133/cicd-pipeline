@@ -128,3 +128,4 @@ Finished: SUCCESS
   - `target/conference-portal.jar` (Size: 34.2 MB executable Spring Boot JAR)
   - `target/surefire-reports/*.xml` (Unit test result report)
 - **Status**: Stable Build (`#14`), Green indicator.
+

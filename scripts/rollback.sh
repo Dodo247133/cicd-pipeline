@@ -28,3 +28,4 @@ else
     echo "❌ [FATAL] Rollback failed health check!"
     exit 1
 fi
+

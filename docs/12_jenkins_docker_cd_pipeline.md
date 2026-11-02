@@ -80,3 +80,4 @@ Finished: SUCCESS
 | `devopscloud/conference-registration-portal` | `latest` | `sha256:d8a9e10...` | linux/amd64 | 84.6 MB | 2 mins ago |
 
 This establishes a fully automated, hands-free commit-to-container continuous deployment pipeline.
+

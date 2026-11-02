@@ -32,3 +32,4 @@ fi
 
 echo "Deployment complete. Executing health verification..."
 ./scripts/healthcheck.sh "http://localhost:$PORT/api/health"
+

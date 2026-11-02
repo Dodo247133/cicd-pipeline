@@ -113,3 +113,4 @@ docker rm conference-portal-app
 # Output: conference-portal-app
 ```
 This demonstrates the complete lifecycle from build, inspect, run, restart, to cleanup.
+

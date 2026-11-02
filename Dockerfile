@@ -45,3 +45,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 
 # Launch application
 ENTRYPOINT ["sh", "-c", "if command -v java > /dev/null; then exec java $JAVA_OPTS -jar /app/app.jar; else exec node /app/server.js; fi"]
+
