@@ -1,7 +1,7 @@
 {
   "name": "conference-registration-portal",
   "version": "1.0.0",
-  "description": "Conference Registration Portal with full CI/CD pipeline",
+  "description": "Conference Registration Portal with Admin Management v1.0.0",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
