@@ -45,3 +45,7 @@ Thumbs.db
 *.swp
 *~
 
+# Tools directory (local Jenkins and JDK binaries)
+tools/
+
+
